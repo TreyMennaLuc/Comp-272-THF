@@ -23,14 +23,14 @@ public class AirportRoutes {
 
     public HashedDirectedGraph buildHubs(DirectedGraph dg) {
         reduced = new HashedDirectedGraph(dg.numSCC);
+        for (String c: dg.stronglyCCs.keySet())
+            reduced.addVertex(c);
         for (Edge e : routes) {
             if (!e.v1.equals(e.v2)) {
                 String c1 = dg.components.get(e.v1);
                 String c2 = dg.components.get(e.v2);
 
                 if (!c1.equals(c2)) {
-                    reduced.addVertex(c1);
-                    reduced.addVertex(c2);
                     reduced.addEdge(c1, c2);
                 }
             }
@@ -50,8 +50,11 @@ public class AirportRoutes {
 
             while (sc.hasNextLine()) {
                 s = sc.nextLine();
-                airports.add(s);
-                numAirports++;
+                if(!airports.contains(s))
+                {
+                    airports.add(s);
+                    numAirports++;
+                }
             }
             while (sc2.hasNextLine()) {
                 s = sc2.nextLine();
@@ -68,11 +71,12 @@ public class AirportRoutes {
     // finds the minimum number of routes to be added from s for full connectivity
     public int minRoutes(String port) {
         int minRoutes = 0;
+        ArrayList<String> noOut = new ArrayList<>();
         for(String checkIn : reduced.hdg.keySet())
         {
             if(reduced.hdg.get(checkIn).getOutList().isEmpty())
             {
-                minRoutes++;
+                    minRoutes++;
             }
         }
         return minRoutes;
@@ -80,7 +84,7 @@ public class AirportRoutes {
 
     // returns the number of flight networks in the underlying undirected graph
 // essentially the number of weakly connected components
-    public int numFlightNetworks(DirectedGraph dg) {
+    public void numFlightNetworks(DirectedGraph dg) {
        DirectedGraph wCC = new DirectedGraph(dg.numVertex);
         for (Edge e : this.routes)
         {
@@ -88,12 +92,11 @@ public class AirportRoutes {
             wCC.addEdge(e.v2, e.v1);
         }
         wCC.addPorts(this.airports);
-        wCC.postOrderDepthFirstTraversal(true);
-        wCC.resetMarked();
-        wCC.depthFirstTraversal();
-        //wCC.regularDepthFirstTraversal();
-        //return wCC.stronglyCCs.size();
-        return wCC.numSCC;
+        //wCC.postOrderDepthFirstTraversal(true);
+       // wCC.resetMarked();
+       // wCC.depthFirstTraversal();
+        wCC.regularDepthFirstTraversal();
+        //return wCC.numSCC;
     }
 
     public static void main(String[] args) {
@@ -108,7 +111,7 @@ public class AirportRoutes {
         dg.depthFirstTraversal();
         HashedDirectedGraph hdg = ar.buildHubs(dg);
         System.out.println("Min # of Airport routes: " + ar.minRoutes("ORD") );
-        System.out.println("Number of Flight Networks: " + ar.numFlightNetworks(dg));
+        ar.numFlightNetworks(dg);
 
     }
 }
