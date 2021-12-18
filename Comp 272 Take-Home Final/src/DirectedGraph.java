@@ -165,7 +165,7 @@ public class DirectedGraph {
             if (!marked.get(port))
             { rDFT (port);}
         weakCC++;
-            System.out.println("Num of weakCC: " + weakCC);
+            System.out.println("Number of Flight Networks: " + weakCC);
 
     }
     public void rDFT(String v){
